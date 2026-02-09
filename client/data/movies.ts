@@ -5,6 +5,8 @@ export interface Movie {
   isVip: boolean;
   rating: number;
   category: "new" | "popular" | "series" | "cartoon" | "program";
+  genres: string[];
+  year?: number;
 }
 
 export const movies: Movie[] = [

@@ -127,14 +127,15 @@ export default function Search() {
 
             {/* Movies grid */}
             {filteredMovies.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {filteredMovies.map((movie) => (
                   <MovieCard
                     key={movie.id}
+                    id={movie.id}
                     title={movie.title}
                     image={movie.image}
                     isVip={movie.isVip}
-                    rating={movie.rating}
+                    views={movie.views}
                   />
                 ))}
               </div>

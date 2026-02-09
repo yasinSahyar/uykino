@@ -114,15 +114,25 @@ export default function Header() {
               ))}
 
               {/* Mobile search */}
-              <div className="flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2 mt-2">
+              <form
+                onSubmit={handleSearch}
+                className="flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2 mt-2"
+              >
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ئىزدە"
                   className="bg-transparent outline-none text-sm flex-1 placeholder-gray-400 text-white rtl"
                   dir="rtl"
                 />
-                <Search size={18} className="text-pink ml-2" />
-              </div>
+                <button
+                  type="submit"
+                  className="text-pink hover:text-pink/80 transition-colors ml-2"
+                >
+                  <Search size={18} />
+                </button>
+              </form>
             </div>
           </nav>
         )}

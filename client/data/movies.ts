@@ -3,7 +3,7 @@ export interface Movie {
   title: string;
   image: string;
   isVip: boolean;
-  rating: number;
+  views: number; // View count (rating will be calculated from this)
   category: "new" | "popular" | "series" | "cartoon" | "program";
   genres: string[];
   year?: number;

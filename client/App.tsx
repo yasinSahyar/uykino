@@ -12,6 +12,7 @@ import Movies from "./pages/Movies";
 import Series from "./pages/Series";
 import Cartoons from "./pages/Cartoons";
 import Programs from "./pages/Programs";
+import Search from "./pages/Search";
 
 const queryClient = new QueryClient();
 

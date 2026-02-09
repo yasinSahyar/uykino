@@ -4,96 +4,111 @@ import { Search, Menu, X } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const navigationItems = [
+    { label: "باش بەت", path: "/", uyghur: true },
+    { label: "كىنو فىلىم", path: "/movies", uyghur: true },
+    { label: "كۆپ قىسىملىق", path: "/series", uyghur: true },
+    { label: "كارتون فىلىم", path: "/cartoons", uyghur: true },
+    { label: "پروگىرامما", path: "/programs", uyghur: true },
+  ];
 
   return (
-    <header className="bg-navy text-white sticky top-0 z-50">
+    <header className="bg-gradient-to-b from-navy via-navy to-navy/95 sticky top-0 z-50 border-b border-pink/20">
+      {/* Main header container */}
       <div className="container mx-auto px-4">
         {/* Top row with logo and search */}
-        <div className="flex items-center justify-between py-4 border-b border-pink/30">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="text-2xl font-bold">
-              <span className="text-pink">ساز</span>
-              <span className="ml-1">كىنو</span>
+        <div className="flex items-center justify-between py-3 gap-4">
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden text-pink hover:text-pink/80 transition-colors"
+          >
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+
+          {/* Search bar - desktop */}
+          <div className="hidden md:flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2 flex-1 max-w-md">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="ئىزدە"
+              className="bg-transparent outline-none text-sm w-full placeholder-gray-400 text-white rtl"
+              dir="rtl"
+            />
+            <Search size={18} className="text-pink ml-2" />
+          </div>
+
+          {/* Logo and brand */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 flex-shrink-0"
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                <span className="text-pink">ساز</span>
+                <span className="text-white ml-1">كىنو</span>
+              </div>
+              <div className="text-xs text-gray-400">www.sazkino.com</div>
             </div>
           </Link>
 
-          {/* Search bar - hidden on mobile */}
-          <div className="hidden md:flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2">
-            <input
-              type="text"
-              placeholder="ئىزدە"
-              className="bg-transparent outline-none text-sm w-48 placeholder-gray-400"
-            />
-            <Search size={18} className="text-pink ml-2" />
+          {/* Right side actions */}
+          <div className="flex items-center gap-3">
+            {/* Search button mobile */}
+            <button className="md:hidden text-pink hover:text-pink/80 transition-colors">
+              <Search size={24} />
+            </button>
+
+            {/* VIP button */}
+            <button className="bg-pink hover:opacity-90 text-white px-4 py-2 rounded-full font-semibold text-sm transition-opacity whitespace-nowrap">
+              VIP ئەزا
+            </button>
           </div>
-
-          {/* Mobile menu toggle */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
-          {/* VIP button - hidden on small screens */}
-          <button className="hidden sm:inline-block bg-pink hover:opacity-90 px-6 py-2 rounded font-semibold text-sm transition-opacity">
-            VIP ئەزا بۇلۇش
-          </button>
         </div>
 
-        {/* Navigation menu */}
-        <nav
-          className={`${
-            isMenuOpen ? "block" : "hidden"
-          } md:flex md:items-center md:justify-center md:gap-8 py-4`}
-        >
-          <Link
-            to="/"
-            className="block py-2 md:py-0 hover:text-pink transition-colors"
-          >
-            باش بەت
-          </Link>
-          <Link
-            to="/movies"
-            className="block py-2 md:py-0 hover:text-pink transition-colors"
-          >
-            فىلىملار
-          </Link>
-          <Link
-            to="/series"
-            className="block py-2 md:py-0 hover:text-pink transition-colors"
-          >
-            كۆپ قسملىق
-          </Link>
-          <Link
-            to="/cartoons"
-            className="block py-2 md:py-0 hover:text-pink transition-colors"
-          >
-            كارتون
-          </Link>
-          <Link
-            to="/programs"
-            className="block py-2 md:py-0 hover:text-pink transition-colors"
-          >
-            پروگراملار
-          </Link>
-
-          {/* VIP button for mobile */}
-          <button className="md:hidden w-full mt-2 bg-pink hover:opacity-90 px-6 py-2 rounded font-semibold text-sm transition-opacity">
-            VIP ئەزا بۇلۇش
-          </button>
+        {/* Navigation menu - desktop */}
+        <nav className="hidden md:flex items-center justify-center gap-8 py-3 border-t border-pink/20 flex-wrap">
+          {navigationItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="text-white hover:text-pink transition-colors font-medium text-sm whitespace-nowrap"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        {/* Mobile search - appears when menu is open */}
+        {/* Mobile menu - expanded */}
         {isMenuOpen && (
-          <div className="md:hidden pb-4 flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2">
-            <input
-              type="text"
-              placeholder="ئىزدە"
-              className="bg-transparent outline-none text-sm flex-1 placeholder-gray-400"
-            />
-            <Search size={18} className="text-pink ml-2" />
-          </div>
+          <nav className="md:hidden border-t border-pink/20 py-4">
+            <div className="flex flex-col gap-3">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-white hover:text-pink transition-colors font-medium py-2 px-2"
+                >
+                  {item.label}
+                </Link>
+              ))}
+
+              {/* Mobile search */}
+              <div className="flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2 mt-2">
+                <input
+                  type="text"
+                  placeholder="ئىزدە"
+                  className="bg-transparent outline-none text-sm flex-1 placeholder-gray-400 text-white rtl"
+                  dir="rtl"
+                />
+                <Search size={18} className="text-pink ml-2" />
+              </div>
+            </div>
+          </nav>
         )}
       </div>
     </header>

@@ -3,9 +3,9 @@ import MovieCard from "@/components/MovieCard";
 import { movies } from "@/data/movies";
 
 export default function Movies() {
-  const allMovies = movies.filter(
-    (m) => m.category === "new" || m.category === "popular"
-  );
+  const allMovies = movies
+    .filter((m) => m.category === "new" || m.category === "popular")
+    .sort((a, b) => b.views - a.views);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
@@ -14,14 +14,15 @@ export default function Movies() {
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-white mb-12">فىلىملار</h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {allMovies.map((movie) => (
             <MovieCard
               key={movie.id}
+              id={movie.id}
               title={movie.title}
               image={movie.image}
               isVip={movie.isVip}
-              rating={movie.rating}
+              views={movie.views}
             />
           ))}
         </div>

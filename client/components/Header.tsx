@@ -79,7 +79,7 @@ export default function Header() {
           </Link>
 
           {/* VIP button for mobile */}
-          <button className="md:hidden w-full mt-2 bg-pink hover:bg-pink/90 px-6 py-2 rounded font-semibold text-sm">
+          <button className="md:hidden w-full mt-2 bg-pink hover:opacity-90 px-6 py-2 rounded font-semibold text-sm transition-opacity">
             VIP ئەزا بۇلۇش
           </button>
         </nav>

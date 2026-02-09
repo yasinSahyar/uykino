@@ -1,12 +1,16 @@
 export interface Movie {
   id: string;
-  title: string;
+  title: string; // فىلىم ئسمى
   image: string;
   isVip: boolean;
   views: number; // View count (rating will be calculated from this)
   category: "new" | "popular" | "series" | "cartoon" | "program";
-  genres: string[];
-  year?: number;
+  genres: string[]; // فىلىم تۈرى
+  year?: number; // فىلىم يىلى
+  country?: string; // فىلىم رايۇنى (Country of Origin)
+  language?: string; // فىلىم تىلى
+  dateAdded?: string; // يوللانغان ۋاقتى (Date added to website)
+  description?: string; // Movie description
 }
 
 export const movies: Movie[] = [

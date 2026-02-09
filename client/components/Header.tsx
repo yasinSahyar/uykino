@@ -36,7 +36,7 @@ export default function Header() {
           </button>
 
           {/* VIP button - hidden on small screens */}
-          <button className="hidden sm:inline-block bg-pink hover:bg-pink/90 px-6 py-2 rounded font-semibold text-sm">
+          <button className="hidden sm:inline-block bg-pink hover:opacity-90 px-6 py-2 rounded font-semibold text-sm transition-opacity">
             VIP ئەزا بۇلۇش
           </button>
         </div>

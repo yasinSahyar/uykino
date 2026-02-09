@@ -14,6 +14,7 @@ import Series from "./pages/Series";
 import Cartoons from "./pages/Cartoons";
 import Programs from "./pages/Programs";
 import Search from "./pages/Search";
+import MovieDetail from "./pages/MovieDetail";
 
 const queryClient = new QueryClient();
 

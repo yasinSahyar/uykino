@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
+  const { user, isLoggedIn, logout } = useAuth();
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();

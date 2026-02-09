@@ -10,6 +10,8 @@ export default function Search() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
 
   useEffect(() => {
     const q = searchParams.get("q");
@@ -18,18 +20,36 @@ export default function Search() {
     }
   }, [searchParams]);
 
+  // Get unique countries and years for filtering
+  const countries = Array.from(
+    new Set(movies.map((m) => m.country).filter(Boolean))
+  );
+  const years = Array.from(
+    new Set(movies.map((m) => m.year).filter(Boolean))
+  ).sort((a, b) => (b || 0) - (a || 0));
+
   // Filter movies
   const filteredMovies = movies.filter((movie) => {
-    const matchesSearch = movie.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      movie.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGenre =
       selectedGenres.length === 0 ||
       selectedGenres.some((g) => movie.genres.includes(g));
     const matchesCategory =
       !selectedCategory || movie.category === selectedCategory;
+    const matchesCountry =
+      !selectedCountry || movie.country === selectedCountry;
+    const matchesYear =
+      !selectedYear || movie.year?.toString() === selectedYear;
 
-    return matchesSearch && matchesGenre && matchesCategory;
+    return (
+      matchesSearch &&
+      matchesGenre &&
+      matchesCategory &&
+      matchesCountry &&
+      matchesYear
+    );
   });
 
   const toggleGenre = (genreId: string) => {

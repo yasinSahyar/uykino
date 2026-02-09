@@ -25,7 +25,7 @@ const NotFound = () => {
           </p>
           <Link
             to="/"
-            className="inline-block bg-pink hover:bg-pink/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+            className="inline-block bg-pink hover:opacity-90 text-white px-8 py-3 rounded-lg font-semibold transition-opacity"
           >
             باش بەتكە قايتىڭ
           </Link>

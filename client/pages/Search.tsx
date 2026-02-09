@@ -22,10 +22,10 @@ export default function Search() {
 
   // Get unique countries and years for filtering
   const countries = Array.from(
-    new Set(movies.map((m) => m.country).filter(Boolean))
+    new Set(movies.map((m) => m.country).filter(Boolean)),
   );
   const years = Array.from(
-    new Set(movies.map((m) => m.year).filter(Boolean))
+    new Set(movies.map((m) => m.year).filter(Boolean)),
   ).sort((a, b) => (b || 0) - (a || 0));
 
   // Filter movies

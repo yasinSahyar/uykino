@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (
     email: string,
     name: string,
-    password: string
+    password: string,
   ): Promise<void> => {
     // Simple registration - in production, you'd send this to a backend
     if (!email || !name || !password) {

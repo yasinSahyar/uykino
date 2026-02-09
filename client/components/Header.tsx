@@ -61,10 +61,7 @@ export default function Header() {
           </form>
 
           {/* Logo and brand */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 flex-shrink-0"
-          >
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="text-center">
               <div className="text-2xl font-bold">
                 <span className="text-pink">ساز</span>

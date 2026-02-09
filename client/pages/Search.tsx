@@ -7,9 +7,7 @@ import { genres, movieCategories } from "@/data/genres";
 
 export default function Search() {
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("q") || ""
-  );
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
@@ -38,7 +36,7 @@ export default function Search() {
     setSelectedGenres((prev) =>
       prev.includes(genreId)
         ? prev.filter((g) => g !== genreId)
-        : [...prev, genreId]
+        : [...prev, genreId],
     );
   };
 

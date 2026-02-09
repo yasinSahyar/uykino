@@ -80,8 +80,8 @@ export default function RegistrationModal({
           {isLogin ? "تىزىمغا كىرىش" : "تىزىمگە قوشۇلۇش"}
         </h2>
         <p className="text-gray-400 mb-6">
-          {movieTitle} كۆرۈش ئۈچۈن {isLogin ? "تىزىمغا كىرىش" : "تىزىمگە قوشۇلۇش"}{" "}
-          كېرەك
+          {movieTitle} كۆرۈش ئۈچۈن{" "}
+          {isLogin ? "تىزىمغا كىرىش" : "تىزىمگە قوشۇلۇش"} كېرەك
         </p>
 
         {/* Form */}

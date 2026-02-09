@@ -95,10 +95,7 @@ export default function MovieCard({
         {/* Rating based on views */}
         <div className="flex justify-center gap-1 mb-2">
           {[...Array(5)].map((_, i) => {
-            const fillPercentage = Math.max(
-              0,
-              Math.min(1, rating - i)
-            );
+            const fillPercentage = Math.max(0, Math.min(1, rating - i));
             return (
               <div key={i} className="relative">
                 <Star size={14} className="text-gray-600" />
@@ -106,10 +103,7 @@ export default function MovieCard({
                   className="absolute top-0 left-0 overflow-hidden"
                   style={{ width: `${fillPercentage * 100}%` }}
                 >
-                  <Star
-                    size={14}
-                    className="fill-pink text-pink"
-                  />
+                  <Star size={14} className="fill-pink text-pink" />
                 </div>
               </div>
             );

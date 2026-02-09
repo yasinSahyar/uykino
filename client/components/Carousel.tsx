@@ -48,7 +48,9 @@ export default function Carousel({ items, title }: CarouselProps) {
 
   return (
     <div className="relative w-full mb-8">
-      {title && <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>}
+      {title && (
+        <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
+      )}
 
       <div className="relative group">
         {/* Left scroll button */}

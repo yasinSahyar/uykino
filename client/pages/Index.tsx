@@ -31,7 +31,7 @@ export default function Index() {
           <p className="text-xl text-gray-300 mb-8">
             سازكىنو تورىدىن ساتالدىق سىنىملىرنى كۆرۈڭ
           </p>
-          <button className="bg-pink hover:bg-pink/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+          <button className="bg-pink hover:opacity-90 text-white px-8 py-3 rounded-lg font-semibold transition-opacity">
             ھازىر باشلاپ كۆرۈڭ
           </button>
         </div>

@@ -112,7 +112,7 @@ export default function Search() {
               </div>
 
               {/* Genre filter */}
-              <div>
+              <div className="mb-8">
                 <h3 className="text-pink font-bold mb-4">ژانۇس</h3>
                 <div className="flex flex-col gap-3">
                   {genres.map((genre) => (
@@ -130,6 +130,40 @@ export default function Search() {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Country filter */}
+              <div className="mb-8">
+                <h3 className="text-pink font-bold mb-4">فىلىم رايۇنى</h3>
+                <select
+                  value={selectedCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  className="w-full bg-navy/50 border border-pink/30 rounded px-3 py-2 text-white focus:outline-none focus:border-pink"
+                >
+                  <option value="">ھەمسە رايۇن</option>
+                  {countries.map((country) => (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Year filter */}
+              <div>
+                <h3 className="text-pink font-bold mb-4">فىلىم يىلى</h3>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="w-full bg-navy/50 border border-pink/30 rounded px-3 py-2 text-white focus:outline-none focus:border-pink"
+                >
+                  <option value="">ھەمسە يىل</option>
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>

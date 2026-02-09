@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import MovieCard from "@/components/MovieCard";
 import { movies } from "@/data/movies";
 import { genres, movieCategories } from "@/data/genres";
 
 export default function Search() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("q") || ""
+  );
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
 
   // Filter movies
   const filteredMovies = movies.filter((movie) => {

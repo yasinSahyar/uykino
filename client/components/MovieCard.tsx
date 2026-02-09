@@ -32,7 +32,7 @@ export default function MovieCard({
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-          <button className="opacity-0 group-hover:opacity-100 bg-pink text-white px-6 py-2 rounded-lg font-semibold transition-opacity duration-300">
+          <button className="opacity-0 group-hover:opacity-100 bg-pink hover:opacity-90 text-white px-6 py-2 rounded-lg font-semibold transition-opacity duration-300">
             بېقىش
           </button>
         </div>

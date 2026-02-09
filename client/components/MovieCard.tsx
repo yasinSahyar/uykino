@@ -58,7 +58,7 @@ export default function MovieCard({
 
   return (
     <>
-      <div className="group cursor-pointer">
+      <div className="group cursor-pointer" onClick={handleCardClick}>
         <div className="relative overflow-hidden rounded-lg mb-3">
           {/* Movie poster image */}
           <img

@@ -37,7 +37,10 @@ export default function Header() {
           </button>
 
           {/* Search bar - desktop */}
-          <div className="hidden md:flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2 flex-1 max-w-md">
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex items-center bg-navy/50 border border-pink/30 rounded px-3 py-2 flex-1 max-w-md"
+          >
             <input
               type="text"
               value={searchQuery}
@@ -46,8 +49,13 @@ export default function Header() {
               className="bg-transparent outline-none text-sm w-full placeholder-gray-400 text-white rtl"
               dir="rtl"
             />
-            <Search size={18} className="text-pink ml-2" />
-          </div>
+            <button
+              type="submit"
+              className="text-pink hover:text-pink/80 transition-colors ml-2"
+            >
+              <Search size={18} />
+            </button>
+          </form>
 
           {/* Logo and brand */}
           <Link

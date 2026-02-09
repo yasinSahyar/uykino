@@ -81,10 +81,47 @@ export default function Header() {
               <Search size={24} />
             </button>
 
-            {/* VIP button */}
-            <button className="bg-pink hover:opacity-90 text-white px-4 py-2 rounded-full font-semibold text-sm transition-opacity whitespace-nowrap">
-              VIP ئەزا
-            </button>
+            {/* User menu or VIP button */}
+            {isLoggedIn && user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="bg-pink hover:opacity-90 text-white px-4 py-2 rounded-full font-semibold text-sm transition-opacity whitespace-nowrap flex items-center gap-2"
+                >
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  {user.name}
+                </button>
+
+                {/* User dropdown menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-navy border border-pink/30 rounded-lg shadow-lg py-2 z-50">
+                    <div className="px-4 py-2 border-b border-pink/20">
+                      <p className="text-white font-semibold text-sm">
+                        {user.name}
+                      </p>
+                      <p className="text-gray-400 text-xs">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowUserMenu(false);
+                        navigate("/");
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-navy/50 transition-colors flex items-center gap-2 text-sm"
+                    >
+                      <LogOut size={16} />
+                      چىقىش
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button className="bg-pink hover:opacity-90 text-white px-4 py-2 rounded-full font-semibold text-sm transition-opacity whitespace-nowrap">
+                VIP ئەزا
+              </button>
+            )}
           </div>
         </div>
 

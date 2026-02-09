@@ -18,6 +18,8 @@ export const movies: Movie[] = [
     isVip: true,
     rating: 4,
     category: "new",
+    genres: ["action", "drama"],
+    year: 2024,
   },
   {
     id: "2",
@@ -27,6 +29,8 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 5,
     category: "new",
+    genres: ["romance", "drama"],
+    year: 2024,
   },
   {
     id: "3",
@@ -36,6 +40,8 @@ export const movies: Movie[] = [
     isVip: true,
     rating: 4,
     category: "new",
+    genres: ["drama"],
+    year: 2024,
   },
   {
     id: "4",
@@ -45,6 +51,8 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 5,
     category: "new",
+    genres: ["action", "adventure"],
+    year: 2024,
   },
   {
     id: "5",
@@ -54,6 +62,8 @@ export const movies: Movie[] = [
     isVip: true,
     rating: 3,
     category: "popular",
+    genres: ["action"],
+    year: 2023,
   },
   {
     id: "6",
@@ -63,6 +73,8 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 4,
     category: "popular",
+    genres: ["comedy", "family"],
+    year: 2023,
   },
   {
     id: "7",
@@ -72,6 +84,8 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 4,
     category: "popular",
+    genres: ["drama"],
+    year: 2023,
   },
   {
     id: "8",
@@ -81,6 +95,8 @@ export const movies: Movie[] = [
     isVip: true,
     rating: 5,
     category: "popular",
+    genres: ["sci-fi", "action"],
+    year: 2023,
   },
   {
     id: "9",
@@ -90,6 +106,8 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 4,
     category: "series",
+    genres: ["drama"],
+    year: 2023,
   },
   {
     id: "10",
@@ -99,6 +117,8 @@ export const movies: Movie[] = [
     isVip: true,
     rating: 5,
     category: "series",
+    genres: ["romance", "drama"],
+    year: 2023,
   },
   {
     id: "11",
@@ -108,6 +128,8 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 4,
     category: "series",
+    genres: ["comedy"],
+    year: 2022,
   },
   {
     id: "12",
@@ -117,5 +139,40 @@ export const movies: Movie[] = [
     isVip: false,
     rating: 5,
     category: "series",
+    genres: ["family", "adventure"],
+    year: 2022,
+  },
+  {
+    id: "13",
+    title: "قايۇق",
+    image:
+      "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=600&fit=crop",
+    isVip: true,
+    rating: 4,
+    category: "cartoon",
+    genres: ["family", "comedy"],
+    year: 2024,
+  },
+  {
+    id: "14",
+    title: "ئۈزگەن",
+    image:
+      "https://images.unsplash.com/photo-1505686994434-e3cc5abf1330?w=400&h=600&fit=crop",
+    isVip: false,
+    rating: 5,
+    category: "cartoon",
+    genres: ["family"],
+    year: 2024,
+  },
+  {
+    id: "15",
+    title: "ستار",
+    image:
+      "https://images.unsplash.com/photo-1489599849228-bed96c3ee9b0?w=400&h=600&fit=crop",
+    isVip: false,
+    rating: 4,
+    category: "program",
+    genres: ["drama"],
+    year: 2024,
   },
 ];

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Star, Play } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import RegistrationModal from "./RegistrationModal";
@@ -18,6 +19,7 @@ export default function MovieCard({
   isVip = false,
   views,
 }: MovieCardProps) {
+  const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const [showRegistration, setShowRegistration] = useState(false);
 
@@ -32,13 +34,15 @@ export default function MovieCard({
 
   const rating = calculateRating(views);
 
-  const handlePlayClick = () => {
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!isLoggedIn) {
       setShowRegistration(true);
-    } else {
-      // In a real app, this would open the video player
-      window.open(`/watch/${id}`, "_blank");
     }
+  };
+
+  const handleCardClick = () => {
+    navigate(`/movie/${id}`);
   };
 
   // Format view count for display

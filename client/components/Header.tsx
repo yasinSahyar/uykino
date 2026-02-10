@@ -78,6 +78,15 @@ export default function Header() {
               <Search size={24} />
             </button>
 
+            {/* Admin link */}
+            <Link
+              to="/admin/login"
+              className="text-gray-400 hover:text-pink text-xs transition-colors"
+              title="ئادمىن پىتقاق"
+            >
+              ئادمىن
+            </Link>
+
             {/* User menu or VIP button */}
             {isLoggedIn && user ? (
               <div className="relative">

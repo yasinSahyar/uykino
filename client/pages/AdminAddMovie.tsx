@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
+import { useMovieById } from "@/hooks/useMovies";
+import { createMovie, updateMovie } from "@/hooks/useMovies";
 import { ArrowLeft, Save } from "lucide-react";
-import { movies, Movie } from "@/data/movies";
+import { Movie } from "@/data/movies";
 import { genres, movieCategories } from "@/data/genres";
 
 export default function AdminAddMovie() {
@@ -17,24 +19,40 @@ export default function AdminAddMovie() {
   }
 
   const isEditing = !!id;
-  const existingMovie = id ? movies.find((m) => m.id === id) : null;
+  const { data: existingMovie } = useMovieById(id || "");
 
-  const [formData, setFormData] = useState<Partial<Movie>>(
-    existingMovie || {
-      id: Date.now().toString(),
-      title: "",
-      image: "",
-      isVip: false,
-      views: 0,
-      category: "new",
-      genres: [],
-      year: new Date().getFullYear(),
-      country: "",
-      language: "ئۇيغۇرچە",
-      dateAdded: new Date().toISOString().split("T")[0],
-      description: "",
+  const [formData, setFormData] = useState<any>({
+    title: "",
+    image: "",
+    isVip: false,
+    views: 0,
+    category: "new",
+    genres: [],
+    year: new Date().getFullYear(),
+    country: "",
+    language: "ئۇيغۇرچە",
+    dateAdded: new Date().toISOString().split("T")[0],
+    description: "",
+  });
+
+  // Update form data when movie data is loaded
+  useEffect(() => {
+    if (existingMovie) {
+      setFormData({
+        title: existingMovie.title || "",
+        image: existingMovie.image || "",
+        isVip: existingMovie.isVip || false,
+        views: existingMovie.views || 0,
+        category: existingMovie.category || "new",
+        genres: existingMovie.genres || [],
+        year: existingMovie.year || new Date().getFullYear(),
+        country: existingMovie.country || "",
+        language: existingMovie.language || "ئۇيغۇرچە",
+        dateAdded: existingMovie.dateAdded || "",
+        description: existingMovie.description || "",
+      });
     }
-  );
+  }, [existingMovie]);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -58,7 +76,7 @@ export default function AdminAddMovie() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -73,16 +91,23 @@ export default function AdminAddMovie() {
       return;
     }
 
-    // In a real app, you would save to database
-    setSuccess(
-      isEditing
-        ? "فىلىم مۇۋەپپەقىيەتلىك ياڭىلاندى"
-        : "فىلىم مۇۋەپپەقىيەتلىك قوشۇلدى"
-    );
+    try {
+      if (isEditing && id) {
+        // Update existing movie
+        await updateMovie(id, formData);
+        setSuccess("فىلىم مۇۋەپپەقىيەتلىك ياڭىلاندى");
+      } else {
+        // Create new movie
+        await createMovie(formData);
+        setSuccess("فىلىم مۇۋەپپەقىيەتلىك قوشۇلدى");
+      }
 
-    setTimeout(() => {
-      navigate("/admin/movies");
-    }, 1500);
+      setTimeout(() => {
+        navigate("/admin/movies");
+      }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "خاتالىق كۆرۈندى");
+    }
   };
 
   return (

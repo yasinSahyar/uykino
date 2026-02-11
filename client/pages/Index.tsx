@@ -3,33 +3,40 @@ import Header from "@/components/Header";
 import MovieCard from "@/components/MovieCard";
 import Carousel from "@/components/Carousel";
 import Banner from "@/components/Banner";
-import { movies } from "@/data/movies";
+import { useMovies } from "@/hooks/useMovies";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Index() {
   const [showBanner, setShowBanner] = useState(true);
 
-  // Organize movies by different categories
-  const newestMovies = [...movies]
-    .sort((a, b) => (b.year || 0) - (a.year || 0))
-    .slice(0, 10);
-
-  const mostWatchedMovies = [...movies]
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
-
-  const mostPopularMovies = [...movies]
-    .filter((m) => m.category === "popular")
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
-
-  const seriesMovies = movies.filter((m) => m.category === "series");
-  const cartoonMovies = movies.filter((m) => m.category === "cartoon");
+  // Fetch movies from API
+  const { data: allMovies = [] } = useMovies({ limit: 100 });
+  const { data: newMovies = [] } = useMovies({
+    sort: "-year",
+    limit: 10,
+  });
+  const { data: mostWatchedMovies = [] } = useMovies({
+    sort: "-views",
+    limit: 10,
+  });
+  const { data: mostPopularMovies = [] } = useMovies({
+    category: "popular",
+    sort: "-views",
+    limit: 10,
+  });
+  const { data: seriesMovies = [] } = useMovies({
+    category: "series",
+    limit: 10,
+  });
+  const { data: cartoonMovies = [] } = useMovies({
+    category: "cartoon",
+    limit: 10,
+  });
 
   // Featured carousel items
-  const featuredItems = mostWatchedMovies.slice(0, 8).map((m) => ({
-    id: m.id,
+  const featuredItems = mostWatchedMovies.slice(0, 8).map((m: any) => ({
+    id: m._id || m.id,
     image: m.image,
     title: m.title,
   }));
@@ -68,10 +75,10 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {newestMovies.map((movie) => (
+            {newMovies.map((movie: any) => (
               <MovieCard
-                key={movie.id}
-                id={movie.id}
+                key={movie._id}
+                id={movie._id}
                 title={movie.title}
                 image={movie.image}
                 isVip={movie.isVip}
@@ -94,10 +101,10 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {mostWatchedMovies.map((movie) => (
+            {mostWatchedMovies.map((movie: any) => (
               <MovieCard
-                key={movie.id}
-                id={movie.id}
+                key={movie._id}
+                id={movie._id}
                 title={movie.title}
                 image={movie.image}
                 isVip={movie.isVip}
@@ -120,10 +127,10 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {mostPopularMovies.map((movie) => (
+            {mostPopularMovies.map((movie: any) => (
               <MovieCard
-                key={movie.id}
-                id={movie.id}
+                key={movie._id}
+                id={movie._id}
                 title={movie.title}
                 image={movie.image}
                 isVip={movie.isVip}
@@ -146,10 +153,10 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {seriesMovies.slice(0, 10).map((movie) => (
+            {seriesMovies.map((movie: any) => (
               <MovieCard
-                key={movie.id}
-                id={movie.id}
+                key={movie._id}
+                id={movie._id}
                 title={movie.title}
                 image={movie.image}
                 isVip={movie.isVip}
@@ -172,10 +179,10 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {cartoonMovies.slice(0, 10).map((movie) => (
+            {cartoonMovies.map((movie: any) => (
               <MovieCard
-                key={movie.id}
-                id={movie.id}
+                key={movie._id}
+                id={movie._id}
                 title={movie.title}
                 image={movie.image}
                 isVip={movie.isVip}

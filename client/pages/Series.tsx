@@ -1,11 +1,12 @@
 import Header from "@/components/Header";
 import MovieCard from "@/components/MovieCard";
-import { movies } from "@/data/movies";
+import { useMovies } from "@/hooks/useMovies";
 
 export default function Series() {
-  const seriesContent = movies
-    .filter((m) => m.category === "series")
-    .sort((a, b) => b.views - a.views);
+  const { data: seriesContent = [], isLoading } = useMovies({
+    category: "series",
+    limit: 100,
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
@@ -14,18 +15,24 @@ export default function Series() {
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-white mb-12">كۆپ قسملىق</h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {seriesContent.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              id={movie.id}
-              title={movie.title}
-              image={movie.image}
-              isVip={movie.isVip}
-              views={movie.views}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">يوكلىنىۋاتىدۇ...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {seriesContent.map((movie: any) => (
+              <MovieCard
+                key={movie._id}
+                id={movie._id}
+                title={movie.title}
+                image={movie.image}
+                isVip={movie.isVip}
+                views={movie.views}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer */}

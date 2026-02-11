@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import MovieCard from "@/components/MovieCard";
-import { movies } from "@/data/movies";
+import { useMovies } from "@/hooks/useMovies";
 import { genres, movieCategories } from "@/data/genres";
 
 export default function Search() {
@@ -20,35 +20,30 @@ export default function Search() {
     }
   }, [searchParams]);
 
-  // Get unique countries and years for filtering
+  // Fetch movies from API with filters
+  const { data: allMovies = [], isLoading } = useMovies({
+    search: searchQuery || undefined,
+    category: selectedCategory || undefined,
+    country: selectedCountry || undefined,
+    year: selectedYear ? parseInt(selectedYear) : undefined,
+    limit: 100,
+  });
+
+  // Get unique countries and years from fetched movies for filtering
   const countries = Array.from(
-    new Set(movies.map((m) => m.country).filter(Boolean)),
-  );
+    new Set(
+      allMovies.map((m: any) => m.country).filter(Boolean)
+    )
+  ).sort();
   const years = Array.from(
-    new Set(movies.map((m) => m.year).filter(Boolean)),
-  ).sort((a, b) => (b || 0) - (a || 0));
+    new Set(allMovies.map((m: any) => m.year).filter(Boolean))
+  ).sort((a: any, b: any) => (b || 0) - (a || 0));
 
-  // Filter movies
-  const filteredMovies = movies.filter((movie) => {
-    const matchesSearch =
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      movie.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGenre =
-      selectedGenres.length === 0 ||
-      selectedGenres.some((g) => movie.genres.includes(g));
-    const matchesCategory =
-      !selectedCategory || movie.category === selectedCategory;
-    const matchesCountry =
-      !selectedCountry || movie.country === selectedCountry;
-    const matchesYear =
-      !selectedYear || movie.year?.toString() === selectedYear;
-
-    return (
-      matchesSearch &&
-      matchesGenre &&
-      matchesCategory &&
-      matchesCountry &&
-      matchesYear
+  // Filter by genres locally since API doesn't support genre filtering yet
+  const filteredMovies = allMovies.filter((movie: any) => {
+    if (selectedGenres.length === 0) return true;
+    return selectedGenres.some((g) =>
+      (movie.genres || []).includes(g)
     );
   });
 
@@ -178,12 +173,16 @@ export default function Search() {
             </div>
 
             {/* Movies grid */}
-            {filteredMovies.length > 0 ? (
+            {isLoading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400">يوكلىنىۋاتىدۇ...</p>
+              </div>
+            ) : filteredMovies.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {filteredMovies.map((movie) => (
+                {filteredMovies.map((movie: any) => (
                   <MovieCard
-                    key={movie.id}
-                    id={movie.id}
+                    key={movie._id}
+                    id={movie._id}
                     title={movie.title}
                     image={movie.image}
                     isVip={movie.isVip}

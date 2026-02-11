@@ -1,11 +1,12 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
+import { useMovies } from "@/hooks/useMovies";
 import { LogOut, Film, Plus, Edit2, Trash2, Users, BarChart3 } from "lucide-react";
-import { movies } from "@/data/movies";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { admin, adminLogout } = useAdmin();
+  const { data: allMovies = [] } = useMovies({ limit: 100 });
 
   // Redirect if not logged in
   if (!admin) {
@@ -18,9 +19,9 @@ export default function AdminDashboard() {
     navigate("/");
   };
 
-  const totalMovies = movies.length;
-  const totalViews = movies.reduce((sum, m) => sum + m.views, 0);
-  const vipMovies = movies.filter((m) => m.isVip).length;
+  const totalMovies = allMovies.length;
+  const totalViews = allMovies.reduce((sum: number, m: any) => sum + (m.views || 0), 0);
+  const vipMovies = allMovies.filter((m: any) => m.isVip).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
@@ -134,8 +135,11 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {movies.slice(0, 10).map((movie) => (
-                    <tr key={movie.id} className="border-b border-pink/10 hover:bg-navy/30 transition-colors">
+                  {allMovies.slice(0, 10).map((movie: any) => (
+                    <tr
+                      key={movie._id}
+                      className="border-b border-pink/10 hover:bg-navy/30 transition-colors"
+                    >
                       <td className="px-6 py-4 text-white">{movie.title}</td>
                       <td className="px-6 py-4 text-gray-400 text-sm">
                         {movie.category}
@@ -154,7 +158,7 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <Link
-                          to={`/admin/movies/edit/${movie.id}`}
+                          to={`/admin/movies/edit/${movie._id}`}
                           className="text-blue-400 hover:text-blue-300 p-2 hover:bg-blue-500/10 rounded transition-colors"
                         >
                           <Edit2 size={18} />

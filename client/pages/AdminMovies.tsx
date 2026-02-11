@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
+import { useMovies, deleteMovie } from "@/hooks/useMovies";
 import { ArrowLeft, Plus, Edit2, Trash2, Search } from "lucide-react";
-import { movies } from "@/data/movies";
 
 export default function AdminMovies() {
   const navigate = useNavigate();
   const { admin } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   // Redirect if not logged in
   if (!admin) {
@@ -15,9 +16,21 @@ export default function AdminMovies() {
     return null;
   }
 
-  const filteredMovies = movies.filter((m) =>
-    m.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Fetch movies from API
+  const { data: allMovies = [], isLoading, refetch } = useMovies({
+    search: searchQuery || undefined,
+    limit: 100,
+  });
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMovie(id);
+      refetch();
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error("Failed to delete movie:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
@@ -61,7 +74,11 @@ export default function AdminMovies() {
 
         {/* Movies table */}
         <div className="bg-navy/50 border border-pink/20 rounded-lg overflow-hidden">
-          {filteredMovies.length > 0 ? (
+          {isLoading ? (
+            <div className="p-8 text-center">
+              <p className="text-gray-400">يوكلىنىۋاتىدۇ...</p>
+            </div>
+          ) : allMovies.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-navy border-b border-pink/20">
@@ -90,10 +107,10 @@ export default function AdminMovies() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMovies.map((movie) => (
+                  {allMovies.map((movie: any) => (
                     <tr
-                      key={movie.id}
-                      className="border-b border-pink/10 hover:bg-navy/30 transition-colors"
+                      key={movie._id}
+                      className="border-b border-pink/10 hover:bg-navy/30 transition-colors relative"
                     >
                       <td className="px-6 py-4 text-white font-medium">
                         {movie.title}
@@ -119,20 +136,40 @@ export default function AdminMovies() {
                           <span className="text-gray-500 text-sm">نورمال</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 flex gap-2">
+                      <td className="px-6 py-4 flex gap-2 relative">
                         <Link
-                          to={`/admin/movies/edit/${movie.id}`}
+                          to={`/admin/movies/edit/${movie._id}`}
                           className="text-blue-400 hover:text-blue-300 p-2 hover:bg-blue-500/10 rounded transition-colors"
                           title="تەھرىرلە"
                         >
                           <Edit2 size={18} />
                         </Link>
                         <button
+                          onClick={() => setDeleteConfirm(movie._id)}
                           className="text-red-400 hover:text-red-300 p-2 hover:bg-red-500/10 rounded transition-colors"
                           title="ئۆچۈر"
                         >
                           <Trash2 size={18} />
                         </button>
+                        {deleteConfirm === movie._id && (
+                          <div className="absolute top-full right-0 mt-2 bg-navy border border-pink rounded p-3 text-xs text-white z-50 whitespace-nowrap">
+                            <p className="mb-2">ئۆچۈرۈشنى تەسدىقلىغندا؟</p>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleDelete(movie._id)}
+                                className="bg-red-500 px-2 py-1 rounded text-xs hover:bg-red-600"
+                              >
+                                بەلى
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="bg-gray-500 px-2 py-1 rounded text-xs hover:bg-gray-600"
+                              >
+                                ياق
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -148,7 +185,7 @@ export default function AdminMovies() {
 
         {/* Results count */}
         <div className="mt-4 text-gray-400 text-sm">
-          {filteredMovies.length} فىلىم تېپىلدى
+          {allMovies.length} فىلىم تېپىلدى
         </div>
       </div>
     </div>

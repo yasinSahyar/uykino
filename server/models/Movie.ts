@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IMovie extends Document {
   title: string; // فىلىم ئسمى
   image: string;
+  video: string; // Video URL from S3
   isVip: boolean;
   views: number;
   category: "new" | "popular" | "series" | "cartoon" | "program";
@@ -25,6 +26,10 @@ const MovieSchema = new Schema<IMovie>(
       minlength: 1,
     },
     image: {
+      type: String,
+      required: true,
+    },
+    video: {
       type: String,
       required: true,
     },

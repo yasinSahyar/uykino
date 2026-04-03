@@ -107,6 +107,7 @@ router.post("/", async (req: Request, res: Response) => {
     const {
       title,
       image,
+      video,
       isVip,
       views,
       category,
@@ -119,10 +120,10 @@ router.post("/", async (req: Request, res: Response) => {
     } = req.body;
 
     // Validate required fields
-    if (!title || !image || !category) {
+    if (!title || !image || !video || !category) {
       res.status(400).json({
         success: false,
-        error: "Missing required fields: title, image, category",
+        error: "Missing required fields: title, image, video, category",
       });
       return;
     }
@@ -130,6 +131,7 @@ router.post("/", async (req: Request, res: Response) => {
     const newMovie: Partial<IMovie> = {
       title,
       image,
+      video,
       isVip: isVip ?? false,
       views: views ?? 0,
       category,
@@ -164,6 +166,7 @@ router.put("/:id", async (req: Request, res: Response) => {
     const {
       title,
       image,
+      video,
       isVip,
       views,
       category,
@@ -180,6 +183,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     if (title !== undefined) updateData.title = title;
     if (image !== undefined) updateData.image = image;
+    if (video !== undefined) updateData.video = video;
     if (isVip !== undefined) updateData.isVip = isVip;
     if (views !== undefined) updateData.views = views;
     if (category !== undefined) updateData.category = category;

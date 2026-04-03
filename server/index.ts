@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import moviesRouter from "./routes/movies";
+import uploadRouter from "./routes/upload";
 
 export function createServer() {
   const app = express();
@@ -19,6 +20,9 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Upload API routes
+  app.use("/api/upload", uploadRouter);
 
   // Movies API routes
   app.use("/api/movies", moviesRouter);

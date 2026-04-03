@@ -1,20 +1,36 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { ArrowLeft, Play, Share2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ArrowLeft, Play, Share2, Loader } from "lucide-react";
 import Header from "@/components/Header";
 import RegistrationModal from "@/components/RegistrationModal";
-import { movies } from "@/data/movies";
 import { useAuth } from "@/context/AuthContext";
+import { useMovieById } from "@/hooks/useMovies";
 
 export default function MovieDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const [showRegistration, setShowRegistration] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const movie = movies.find((m) => m.id === id);
+  const { data: movie, isLoading, error } = useMovieById(id || "");
 
-  if (!movie) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
+        <Header />
+        <div className="container mx-auto px-4 py-12 flex items-center justify-center h-96">
+          <div className="flex flex-col items-center gap-4">
+            <Loader className="animate-spin text-pink" size={48} />
+            <p className="text-gray-400">لادىيالاتىۋاتىدۇ...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !movie) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
         <Header />
@@ -37,6 +53,9 @@ export default function MovieDetail() {
   const handlePlay = () => {
     if (!isLoggedIn) {
       setShowRegistration(true);
+    } else {
+      setIsPlaying(true);
+      videoRef.current?.play();
     }
   };
 
@@ -60,6 +79,13 @@ export default function MovieDetail() {
 
   const rating = calculateRating(movie.views);
 
+  // Format view count
+  const formatViews = (count: number) => {
+    if (count >= 1000000) return (count / 1000000).toFixed(1) + "M";
+    if (count >= 1000) return (count / 1000).toFixed(1) + "K";
+    return count.toString();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-navy via-navy to-navy/95">
       <Header />
@@ -76,35 +102,51 @@ export default function MovieDetail() {
 
         {/* Movie detail container */}
         <div className="bg-navy/50 rounded-lg overflow-hidden border border-pink/20">
-          {/* Header with image and play button */}
-          <div className="relative overflow-hidden h-80 md:h-96 bg-black">
-            <img
-              src={movie.image}
-              alt={movie.title}
-              className="w-full h-full object-cover"
-            />
-
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent" />
-
-            {/* VIP badge */}
-            {movie.isVip && (
-              <div className="absolute top-6 right-6 bg-pink text-white px-4 py-2 rounded-full font-bold text-sm">
-                VIP
-              </div>
-            )}
-
-            {/* Play button overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <button
-                onClick={handlePlay}
-                className="bg-pink hover:bg-pink/90 text-white px-12 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-110 flex items-center gap-3"
+          {/* Video Player */}
+          {isPlaying && isLoggedIn ? (
+            <div className="relative bg-black w-full" style={{ aspectRatio: "16/9" }}>
+              <video
+                ref={videoRef}
+                controls
+                autoPlay
+                className="w-full h-full"
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
               >
-                <Play size={28} fill="currentColor" />
-                بېقىش
-              </button>
+                <source src={movie.video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
-          </div>
+          ) : (
+            <div className="relative overflow-hidden h-80 md:h-96 bg-black">
+              <img
+                src={movie.image}
+                alt={movie.title}
+                className="w-full h-full object-cover"
+              />
+
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent" />
+
+              {/* VIP badge */}
+              {movie.isVip && (
+                <div className="absolute top-6 right-6 bg-pink text-white px-4 py-2 rounded-full font-bold text-sm">
+                  VIP
+                </div>
+              )}
+
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <button
+                  onClick={handlePlay}
+                  className="bg-pink hover:bg-pink/90 text-white px-12 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-110 flex items-center gap-3"
+                >
+                  <Play size={28} fill="currentColor" />
+                  بېقىش
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Movie information */}
           <div className="p-8">
@@ -120,7 +162,7 @@ export default function MovieDetail() {
                   <span className="text-yellow-400 text-lg font-bold">
                     ⭐ {rating.toFixed(1)}/5
                   </span>
-                  <span className="text-gray-400">({movie.views} كۆرۈش)</span>
+                  <span className="text-gray-400">({formatViews(movie.views)} كۆرۈش)</span>
                 </div>
               </div>
             </div>
@@ -137,14 +179,18 @@ export default function MovieDetail() {
               <div>
                 <p className="text-pink font-bold text-sm mb-2">فىلىم تۈرى</p>
                 <div className="flex flex-wrap gap-2">
-                  {movie.genres.map((genre) => (
-                    <span
-                      key={genre}
-                      className="bg-pink/20 border border-pink/50 text-pink px-3 py-1 rounded text-sm"
-                    >
-                      {genre}
-                    </span>
-                  ))}
+                  {movie.genres && movie.genres.length > 0 ? (
+                    movie.genres.map((genre) => (
+                      <span
+                        key={genre}
+                        className="bg-pink/20 border border-pink/50 text-pink px-3 py-1 rounded text-sm"
+                      >
+                        {genre}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-gray-400">نەمە</span>
+                  )}
                 </div>
               </div>
 

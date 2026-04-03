@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { useMovieById } from "@/hooks/useMovies";
 import { createMovie, updateMovie } from "@/hooks/useMovies";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Upload, Loader } from "lucide-react";
 import { Movie } from "@/data/movies";
 import { genres, movieCategories } from "@/data/genres";
 
@@ -24,6 +24,7 @@ export default function AdminAddMovie() {
   const [formData, setFormData] = useState<any>({
     title: "",
     image: "",
+    video: "",
     isVip: false,
     views: 0,
     category: "new",
@@ -35,12 +36,26 @@ export default function AdminAddMovie() {
     description: "",
   });
 
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{
+    video?: boolean;
+    image?: boolean;
+  }>({});
+
+  const [previewFiles, setPreviewFiles] = useState<{
+    videoName?: string;
+    imageName?: string;
+    videoUrl?: string;
+    imageUrl?: string;
+  }>({});
+
   // Update form data when movie data is loaded
   useEffect(() => {
     if (existingMovie) {
       setFormData({
         title: existingMovie.title || "",
         image: existingMovie.image || "",
+        video: existingMovie.video || "",
         isVip: existingMovie.isVip || false,
         views: existingMovie.views || 0,
         category: existingMovie.category || "new",
@@ -50,6 +65,10 @@ export default function AdminAddMovie() {
         language: existingMovie.language || "ئۇيغۇرچە",
         dateAdded: existingMovie.dateAdded || "",
         description: existingMovie.description || "",
+      });
+      setPreviewFiles({
+        videoUrl: existingMovie.video,
+        imageUrl: existingMovie.image,
       });
     }
   }, [existingMovie]);
@@ -76,6 +95,61 @@ export default function AdminAddMovie() {
     }));
   };
 
+  const uploadFile = async (file: File, type: "video" | "image") => {
+    try {
+      setUploadProgress((prev) => ({ ...prev, [type]: true }));
+
+      const formDataToSend = new FormData();
+      formDataToSend.append(type, file);
+
+      const response = await fetch(`/api/upload/${type}`, {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload ${type}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFormData((prev) => ({
+          ...prev,
+          [type]: result.data.url,
+        }));
+
+        setPreviewFiles((prev) => ({
+          ...prev,
+          [`${type}Name`]: file.name,
+          [`${type}Url`]: result.data.url,
+        }));
+
+        setError("");
+      } else {
+        throw new Error(result.error || `Failed to upload ${type}`);
+      }
+    } catch (err) {
+      setError(`خاتالىق: ${err instanceof Error ? err.message : "فايل يۆتكىلىپ بېرىشتە خاتالىق"}`);
+    } finally {
+      setUploadProgress((prev) => ({ ...prev, [type]: false }));
+    }
+  };
+
+  const handleVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await uploadFile(file, "video");
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await uploadFile(file, "image");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -90,8 +164,14 @@ export default function AdminAddMovie() {
       setError("فىلىم سۇرىتى مەجبۇرى");
       return;
     }
+    if (!formData.video) {
+      setError("فىلىم ۋىدېوسى مەجبۇرى");
+      return;
+    }
 
     try {
+      setUploading(true);
+
       if (isEditing && id) {
         // Update existing movie
         await updateMovie(id, formData);
@@ -107,6 +187,8 @@ export default function AdminAddMovie() {
       }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "خاتالىق كۆرۈندى");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -144,6 +226,97 @@ export default function AdminAddMovie() {
             </div>
           )}
 
+          {/* Video Upload */}
+          <div className="mb-8 p-6 border border-pink/30 rounded-lg bg-navy/30">
+            <label className="block text-sm font-medium text-pink mb-4">
+              فىلىم ۋىدېوسى *
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="video/*"
+                onChange={handleVideoChange}
+                disabled={uploadProgress.video}
+                className="hidden"
+                id="video-input"
+              />
+              <label
+                htmlFor="video-input"
+                className="flex items-center justify-center w-full p-8 border-2 border-dashed border-pink/50 rounded-lg cursor-pointer hover:border-pink transition-colors"
+              >
+                <div className="text-center">
+                  {uploadProgress.video ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader className="animate-spin text-pink" size={32} />
+                      <p className="text-pink">يۆتكىلىۋاتىدۇ...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="mx-auto mb-2 text-pink" size={32} />
+                      <p className="text-white font-medium">ۋىدېو فايلىنى تاللاڭ</p>
+                      <p className="text-gray-400 text-sm">ياكى بۇيەرگە تۈشۈرۈڭ</p>
+                    </>
+                  )}
+                </div>
+              </label>
+            </div>
+            {previewFiles.videoUrl && (
+              <div className="mt-4 p-4 bg-green-500/10 border border-green-500 rounded">
+                <p className="text-green-400 text-sm">✓ ۋىدېو يۆتكىلىندى</p>
+                <p className="text-gray-300 text-xs mt-1">{previewFiles.videoName}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Image Upload */}
+          <div className="mb-8 p-6 border border-pink/30 rounded-lg bg-navy/30">
+            <label className="block text-sm font-medium text-pink mb-4">
+              سۇرەت (پوستېر) *
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={uploadProgress.image}
+                className="hidden"
+                id="image-input"
+              />
+              <label
+                htmlFor="image-input"
+                className="flex items-center justify-center w-full p-8 border-2 border-dashed border-pink/50 rounded-lg cursor-pointer hover:border-pink transition-colors"
+              >
+                <div className="text-center">
+                  {uploadProgress.image ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader className="animate-spin text-pink" size={32} />
+                      <p className="text-pink">يۆتكىلىۋاتىدۇ...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="mx-auto mb-2 text-pink" size={32} />
+                      <p className="text-white font-medium">سۇرەت فايلىنى تاللاڭ</p>
+                      <p className="text-gray-400 text-sm">ياكى بۇيەرگە تۈشۈرۈڭ</p>
+                    </>
+                  )}
+                </div>
+              </label>
+            </div>
+            {previewFiles.imageUrl && (
+              <div className="mt-4 flex gap-4">
+                <img
+                  src={previewFiles.imageUrl}
+                  alt="Preview"
+                  className="h-32 w-24 object-cover rounded"
+                />
+                <div className="flex-1">
+                  <p className="text-green-400 text-sm">✓ سۇرەت يۆتكىلىندى</p>
+                  <p className="text-gray-300 text-xs mt-1">{previewFiles.imageName}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Two column grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Left column */}
@@ -159,21 +332,6 @@ export default function AdminAddMovie() {
                   value={formData.title || ""}
                   onChange={handleInputChange}
                   placeholder="فىلىم ئسمىنى كىرگۈزۈڭ"
-                  className="w-full bg-navy/50 border border-pink/30 rounded px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-pink"
-                />
-              </div>
-
-              {/* Image URL */}
-              <div>
-                <label className="block text-sm font-medium text-pink mb-2">
-                  سۇرەت URL *
-                </label>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image || ""}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
                   className="w-full bg-navy/50 border border-pink/30 rounded px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-pink"
                 />
               </div>
@@ -332,9 +490,10 @@ export default function AdminAddMovie() {
           <div className="flex gap-4">
             <button
               type="submit"
-              className="flex items-center gap-2 bg-pink hover:bg-pink/90 text-white px-8 py-2 rounded-lg font-semibold transition-colors"
+              disabled={uploading}
+              className="flex items-center gap-2 bg-pink hover:bg-pink/90 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-2 rounded-lg font-semibold transition-colors"
             >
-              <Save size={20} />
+              {uploading ? <Loader className="animate-spin" size={20} /> : <Save size={20} />}
               {isEditing ? "ياڭىلا" : "قوش"}
             </button>
             <button

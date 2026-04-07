@@ -1,19 +1,25 @@
 import { Router, Request, Response } from "express";
 import { Movie, IMovie } from "../models/Movie";
 import { connectDatabase } from "../config/database";
+import { memoryDb } from "../db/memory";
 
 const router = Router();
+
+let useMemoryDb = false;
 
 // Ensure database is connected
 router.use(async (req, res, next) => {
   try {
     await connectDatabase();
-    next();
+    useMemoryDb = false;
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Database connection failed", details: String(error) });
+    // Fall back to memory database
+    useMemoryDb = true;
+    console.warn(
+      "MongoDB not available, using in-memory database for this session"
+    );
   }
+  next();
 });
 
 // GET all movies with filters
@@ -48,14 +54,37 @@ router.get("/", async (req: Request, res: Response) => {
       filter.$text = { $search: search };
     }
 
-    // Execute query with pagination
-    const movies = await Movie.find(filter)
-      .sort(sort as string)
-      .limit(parseInt(limit as string))
-      .skip(parseInt(skip as string))
-      .exec();
+    let movies: any[];
+    let total: number;
 
-    const total = await Movie.countDocuments(filter);
+    if (useMemoryDb) {
+      // Use memory database
+      movies = await memoryDb.find(filter);
+      total = await memoryDb.countDocuments(filter);
+
+      // Apply sorting
+      if (sort === "-views") {
+        movies.sort((a, b) => b.views - a.views);
+      } else if (sort === "-year") {
+        movies.sort((a, b) => (b.year || 0) - (a.year || 0));
+      }
+    } else {
+      // Use MongoDB
+      movies = await Movie.find(filter)
+        .sort(sort as string)
+        .limit(parseInt(limit as string))
+        .skip(parseInt(skip as string))
+        .exec();
+
+      total = await Movie.countDocuments(filter);
+    }
+
+    // Apply pagination from memory results if needed
+    if (useMemoryDb) {
+      const skipNum = parseInt(skip as string);
+      const limitNum = parseInt(limit as string);
+      movies = movies.slice(skipNum, skipNum + limitNum);
+    }
 
     res.json({
       success: true,
@@ -78,7 +107,13 @@ router.get("/", async (req: Request, res: Response) => {
 // GET single movie by ID
 router.get("/:id", async (req: Request, res: Response) => {
   try {
-    const movie = await Movie.findById(req.params.id);
+    let movie;
+
+    if (useMemoryDb) {
+      movie = await memoryDb.findById(req.params.id);
+    } else {
+      movie = await Movie.findById(req.params.id);
+    }
 
     if (!movie) {
       res.status(404).json({
@@ -128,7 +163,7 @@ router.post("/", async (req: Request, res: Response) => {
       return;
     }
 
-    const newMovie: Partial<IMovie> = {
+    const movieData: Partial<IMovie> = {
       title,
       image,
       video,
@@ -139,12 +174,17 @@ router.post("/", async (req: Request, res: Response) => {
       year,
       country,
       language: language || "ئۇيغۇرچە",
-      dateAdded:
-        dateAdded || new Date().toISOString().split("T")[0],
+      dateAdded: dateAdded || new Date().toISOString().split("T")[0],
       description,
     };
 
-    const movie = await Movie.create(newMovie);
+    let movie;
+
+    if (useMemoryDb) {
+      movie = await memoryDb.create(movieData);
+    } else {
+      movie = await Movie.create(movieData);
+    }
 
     res.status(201).json({
       success: true,
@@ -194,10 +234,16 @@ router.put("/:id", async (req: Request, res: Response) => {
     if (dateAdded !== undefined) updateData.dateAdded = dateAdded;
     if (description !== undefined) updateData.description = description;
 
-    const movie = await Movie.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    let movie;
+
+    if (useMemoryDb) {
+      movie = await memoryDb.findByIdAndUpdate(req.params.id, updateData);
+    } else {
+      movie = await Movie.findByIdAndUpdate(req.params.id, updateData, {
+        new: true,
+        runValidators: true,
+      });
+    }
 
     if (!movie) {
       res.status(404).json({
@@ -224,7 +270,13 @@ router.put("/:id", async (req: Request, res: Response) => {
 // DELETE movie
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
-    const movie = await Movie.findByIdAndDelete(req.params.id);
+    let movie;
+
+    if (useMemoryDb) {
+      movie = await memoryDb.findByIdAndDelete(req.params.id);
+    } else {
+      movie = await Movie.findByIdAndDelete(req.params.id);
+    }
 
     if (!movie) {
       res.status(404).json({
@@ -251,22 +303,34 @@ router.delete("/:id", async (req: Request, res: Response) => {
 // GET stats/summary
 router.get("/stats/summary", async (req: Request, res: Response) => {
   try {
-    const total = await Movie.countDocuments();
-    const totalViews = await Movie.aggregate([
-      {
-        $group: {
-          _id: null,
-          views: { $sum: "$views" },
+    let total: number;
+    let totalViews: number;
+    let vipCount: number;
+
+    if (useMemoryDb) {
+      const allMovies = await memoryDb.find({});
+      total = allMovies.length;
+      totalViews = allMovies.reduce((sum, m) => sum + m.views, 0);
+      vipCount = allMovies.filter((m) => m.isVip).length;
+    } else {
+      total = await Movie.countDocuments();
+      const result = await Movie.aggregate([
+        {
+          $group: {
+            _id: null,
+            views: { $sum: "$views" },
+          },
         },
-      },
-    ]);
-    const vipCount = await Movie.countDocuments({ isVip: true });
+      ]);
+      totalViews = result[0]?.views || 0;
+      vipCount = await Movie.countDocuments({ isVip: true });
+    }
 
     res.json({
       success: true,
       data: {
         totalMovies: total,
-        totalViews: totalViews[0]?.views || 0,
+        totalViews: totalViews,
         vipMovies: vipCount,
       },
     });

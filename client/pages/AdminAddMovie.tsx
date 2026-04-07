@@ -12,12 +12,7 @@ export default function AdminAddMovie() {
   const { id } = useParams<{ id?: string }>();
   const { admin } = useAdmin();
 
-  // Redirect if not logged in
-  if (!admin) {
-    navigate("/admin/login");
-    return null;
-  }
-
+  // Call all hooks BEFORE any early returns
   const isEditing = !!id;
   const { data: existingMovie } = useMovieById(id || "");
 
@@ -48,6 +43,12 @@ export default function AdminAddMovie() {
     videoUrl?: string;
     imageUrl?: string;
   }>({});
+
+  // Redirect if not logged in (after hooks are called)
+  if (!admin) {
+    navigate("/admin/login");
+    return null;
+  }
 
   // Update form data when movie data is loaded
   useEffect(() => {

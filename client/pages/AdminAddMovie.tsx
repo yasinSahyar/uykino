@@ -127,7 +127,8 @@ export default function AdminAddMovie() {
 
         setError("");
       } else {
-        throw new Error(result.error || `Failed to upload ${type}`);
+        const errorMsg = result.details || result.error || `Failed to upload ${type}`;
+        throw new Error(errorMsg);
       }
     } catch (err) {
       setError(`خاتالىق: ${err instanceof Error ? err.message : "فايل يۆتكىلىپ بېرىشتە خاتالىق"}`);
